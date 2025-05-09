@@ -36,10 +36,7 @@ public class Playlists {
         this.pin = pin;
     }
 
-    public static Playlists of(PlaylistResponse playlist, Users user){
-        int hash = playlist.getPlaylistId().hashCode();
-        // Ensure a positive number and limit to 6 digits
-        String pin = String.valueOf(Math.abs(hash % 1_000_000));
+    public static Playlists of(PlaylistResponse playlist, Users user, String pin){
         return Playlists.builder()
                 .playlistId(playlist.getPlaylistId())
                 .customTitle("")
