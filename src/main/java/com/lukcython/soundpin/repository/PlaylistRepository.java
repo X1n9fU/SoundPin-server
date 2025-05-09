@@ -11,4 +11,6 @@ public interface PlaylistRepository extends JpaRepository<Playlists, Long> {
     Optional<Playlists> findByPlaylistId(String playlistId);
     @Query("SELECT p from Playlists p where p.pin=:pin")
     Optional<Playlists> findByPin(String pin);
+
+    boolean existsByPin(String pin);
 }

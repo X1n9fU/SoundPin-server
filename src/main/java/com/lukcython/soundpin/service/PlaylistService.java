@@ -15,6 +15,7 @@ import com.lukcython.soundpin.dto.PlaylistResponse;
 import com.lukcython.soundpin.dto.PlaylistResponse.PlaylistInfoResponse;
 import com.lukcython.soundpin.repository.PlaylistRepository;
 import com.lukcython.soundpin.repository.UserRepository;
+import com.lukcython.soundpin.util.PinUtil;
 import com.lukcython.soundpin.util.youtube.YoutubeApiUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class PlaylistService {
     private final PlaylistRepository playlistRepository;
     private final HttpSession httpSession;
     private final UserRepository userRepository;
+    private final PinUtil pinUtil;
 
     public List<PlaylistResponse> getPlaylist() throws GeneralSecurityException, IOException {
         YouTube youtubeService = YoutubeApiUtil.getService();
@@ -62,7 +64,12 @@ public class PlaylistService {
                 .map(PlaylistResponse::of)
                 .map(playlist -> {
                     Optional<Playlists> play = playlistRepository.findByPlaylistId(playlist.getPlaylistId());
-                    return playlist.of(play.orElseGet(() -> playlistRepository.save(Playlists.of(playlist, users))));
+                    return playlist.of(
+                            play.orElseGet(() -> {
+                                String pin = pinUtil.generateUniquePin(playlist.getPlaylistId(), String.valueOf(users.getId()));
+                                return playlistRepository.save(Playlists.of(playlist, users, pin));
+                            })
+                    );
                 }).toList();
     }
 
